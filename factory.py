@@ -1,12 +1,14 @@
+#! -*- encoding: utf-8 -*-
 from config import databases
 import MySQLdb
 import MySQLdb.cursors
 
-class DatabaseFactory:
+
+class DatabaseFactory(object):
 	connections = {}
 
 	@staticmethod
-	def instance(database = 'default'):
+	def instance(database='default'):
 		MySQLdb.paramstyle = 'qmark'
 		if database in DatabaseFactory.connections:
 			return DatabaseFactory.connections[database]
@@ -14,16 +16,18 @@ class DatabaseFactory:
 		dbinfo = DatabaseFactory.get_properties(database)
 		if dbinfo is None:
 			return None
+
 		db = None
 
 		try:
 			db = MySQLdb.connect(
-				host = dbinfo['host'],
-				user = dbinfo['user'],
-				passwd = dbinfo['password'],
-				db = dbinfo['dbname'],
-				cursorclass = MySQLdb.cursors.DictCursor
+				host=dbinfo['host'],
+				user=dbinfo['user'],
+				passwd=dbinfo['password'],
+				db=dbinfo['dbname'],
+				cursorclass=MySQLdb.cursors.DictCursor
 			)
+
 			db.autocommit(True)
 			DatabaseFactory.connections[database] = db
 
@@ -33,7 +37,7 @@ class DatabaseFactory:
 		return db
 
 	@staticmethod
-	def close_connections(uno):
+	def close_connections():
 		for key in DatabaseFactory.connections:
 			DatabaseFactory.connections[key].close()
 			DatabaseFactory.connections = {}
